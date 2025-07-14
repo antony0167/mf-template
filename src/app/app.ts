@@ -1,12 +1,23 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.html',
+  standalone: true,
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('mf-template');
+  counter = 0;
+
+  sendToHost() {
+    window.parent.postMessage({
+      type: 'buttonClicked',
+      detail: {
+        name: 'buttonClicked',
+        count: this.counter++
+      }
+    }, '*');
+  }
 }
