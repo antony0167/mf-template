@@ -9,7 +9,7 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.css'
 })
 export class App {
-  counter = 0;
+  counter = 1;
 
   sendToHost() {
     window.parent.postMessage({
