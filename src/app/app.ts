@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
 
 @Component({
@@ -8,7 +8,7 @@ import {ActivatedRoute, RouterOutlet} from '@angular/router';
   standalone: true,
   styleUrl: './app.css'
 })
-export class App implements OnInit {
+export class App implements OnInit, OnDestroy {
   id = -1;
   receivedId: number | undefined;
   n = 10;
@@ -25,17 +25,20 @@ export class App implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       if (params['id']) {
-        console.log(params['id']);
         this.id = params['id'];
       }
     });
 
-    setInterval(() => {
-      this.sendToHost();
+    this.startCommunication();
+  }
+
+  startCommunication() {
+    this.myInterval = setInterval(() => {
+      this.sendMessage();
     }, 5000);
   }
 
-  sendToHost() {
+  sendMessage() {
     let randomIds = () => {
       let uniqueNumbers:Set<number> = new Set();
       while (uniqueNumbers.size < 5) {
@@ -59,13 +62,23 @@ export class App implements OnInit {
   }
 
   @HostListener('window:message', ['$event'])
-  handleSendToChild(event: MessageEvent) {
-    if (event.data?.type === 'sendToChild') {
+  handleMessage(event: MessageEvent) {
+
+    if (event.origin !== 'http://localhost:4200') return;
+
+
+    if (event.data?.type === 'sendMessage' && event.data.detail) {
       const detail = event.data.detail;
       this.receivedId = detail.sourceId;
       this.count++;
       this.sources.push(detail.sourceId);
       this.operationValues.push(detail.sourceId + detail.targetId / detail.random)
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.myInterval) {
+      clearInterval(this.myInterval);
     }
   }
 
