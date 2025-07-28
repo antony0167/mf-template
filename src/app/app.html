@@ -1,1 +1,6 @@
-<app-mf-post></app-mf-post>
+<p>This is an iframe with ID: {{id}}</p>
+@if(receivedId) {
+  <p>The message came from id nr: {{receivedId}}</p>
+
+  <!--  <p>Last operation value = {{operationValues[operationValues.length - 1]}}</p>-->
+}
